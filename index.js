@@ -2,7 +2,7 @@ const DEFAULT_FONT_COLOR = 'black'
 
 let fever = false;
 
-document.getElementById('fever').onclick = (e) => {
+document.querySelector('button[type="fever"]').onclick = (e) => {
     fever = !fever
     document.body.style.backgroundColor = fever ? 'black' : 'white'
 
@@ -32,8 +32,6 @@ const handleOnDragend = (e) => {
 
 const handleOnDragover = (e) => {
     e.preventDefault()
-    const id = e.dataTransfer.getData('id');
-    console.log(e)
 }
 
 const handleOnDrop = (e) => {
@@ -129,7 +127,7 @@ window.onload = () => {
     form.onsubmit = e => {
         e.preventDefault()
         const sawai = createWords(e.currentTarget.words.value, 0, 30, Math.random()*400)
-        setInterval(sawai.move,10)
+        setInterval(sawai.move,Math.random()*10)
         document.getElementById('wordsArea').appendChild(sawai)
     }
 }
