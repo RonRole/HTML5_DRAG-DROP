@@ -50,21 +50,8 @@ const Status = {
     DEFAULT : "DEFAULT"
 }
 
-const createWords = (text, defaultX=0, defaultY=0, defaultDegree) => {
-    const sawai = document.createElement('span')
-    sawai.degree = defaultDegree
-    sawai.innerHTML = text
-    sawai.className = 'word'
-    sawai.id = gen.next().value;
-    sawai.draggable = true
-    sawai.dropzone = 'move'
-    sawai.ondragstart = handleOnDragstart
-    sawai.ondragend = handleOnDragend
-    sawai.ondragover = handleOnDragover
-    sawai.ondrop = handleOnDrop
-    sawai.currentX = () => parseFloat(sawai.style.left.match(/-?[\.0-9]*/)[0]) || defaultX
-    sawai.currentY = () => parseFloat(sawai.style.top.match(/-?[\.0-9]*/)[0]) || defaultY
-    sawai.move = () => {
+const Moves = {
+    default : sawai => {
         const WIDTH = document.body.clientWidth
         const HEIGHT = document.body.clientHeight
         sawai.style.color = fever ? `rgb(${Math.random()*280},${Math.random()*280},${Math.random()*280})` : DEFAULT_FONT_COLOR
@@ -114,10 +101,35 @@ const createWords = (text, defaultX=0, defaultY=0, defaultDegree) => {
         }
 
         const {x,y,degree} = {...nextParameters()}
-        
         const rad = degree * Math.PI / 180
         sawai.style.left = `${x + Math.cos(rad)}px`
         sawai.style.top = `${y + Math.sin(rad)}px`
+    },
+    logging : sawai => {
+        console.log(sawai.innerHTML)
+    }
+}
+
+const createWords = (text, defaultX=0, defaultY=0, defaultDegree) => {
+    const sawai = document.createElement('span')
+    sawai.degree = defaultDegree
+    sawai.innerHTML = text
+    sawai.className = 'word'
+    sawai.id = gen.next().value;
+    sawai.draggable = true
+    sawai.dropzone = 'move'
+    sawai.ondragstart = handleOnDragstart
+    sawai.ondragend = handleOnDragend
+    sawai.ondragover = handleOnDragover
+    sawai.ondrop = handleOnDrop
+    sawai.currentX = () => parseFloat(sawai.style.left.match(/-?[\.0-9]*/)[0]) || defaultX
+    sawai.currentY = () => parseFloat(sawai.style.top.match(/-?[\.0-9]*/)[0]) || defaultY
+    sawai.move = () => Moves.default(sawai)
+    sawai.onmouseover = e => {
+        sawai.move = () => Moves.logging(sawai)
+    }
+    sawai.onmouseleave = e => {
+        sawai.move = () => Moves.default(sawai)
     }
     return sawai
 }
@@ -127,7 +139,7 @@ window.onload = () => {
     form.onsubmit = e => {
         e.preventDefault()
         const sawai = createWords(e.currentTarget.words.value, 0, 30, Math.random()*400)
-        setInterval(sawai.move,Math.random()*10)
+        setInterval(()=>sawai.move(), Math.random()*10)
         document.getElementById('wordsArea').appendChild(sawai)
     }
 }
