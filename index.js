@@ -105,6 +105,14 @@ const Moves = {
         sawai.style.left = `${x + Math.cos(rad)}px`
         sawai.style.top = `${y + Math.sin(rad)}px`
     },
+    comeToPoint : (sawai, pointX, pointY) => {
+        const x = sawai.currentX()
+        const y = sawai.currentY()
+        const rad = Math.atan2(x-pointX, y-pointY)
+        console.log(180*rad/Math.PI)
+        sawai.style.left = `${x + Math.cos(rad)}px`
+        sawai.style.top = `${y + Math.sin(rad)}px`
+    },
     logging : sawai => {
         console.log(sawai.innerHTML)
     }
@@ -125,12 +133,6 @@ const createWords = (text, defaultX=0, defaultY=0, defaultDegree) => {
     sawai.currentX = () => parseFloat(sawai.style.left.match(/-?[\.0-9]*/)[0]) || defaultX
     sawai.currentY = () => parseFloat(sawai.style.top.match(/-?[\.0-9]*/)[0]) || defaultY
     sawai.move = () => Moves.default(sawai)
-    sawai.onmouseover = e => {
-        sawai.move = () => Moves.logging(sawai)
-    }
-    sawai.onmouseleave = e => {
-        sawai.move = () => Moves.default(sawai)
-    }
     return sawai
 }
 
@@ -142,4 +144,16 @@ window.onload = () => {
         setInterval(()=>sawai.move(), Math.random()*10)
         document.getElementById('wordsArea').appendChild(sawai)
     }
+}
+
+window.onmousedown = (e) => {
+    document.querySelectorAll("span.word").forEach(word => {
+        word.move = () => Moves.comeToPoint(word, e.clientX, e.clientY)
+    })
+}
+
+window.onmouseup = (e) => {
+    document.querySelectorAll("span.word").forEach(word => {
+        word.move = () => Moves.default(word)
+    })
 }
